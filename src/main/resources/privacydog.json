@@ -1,0 +1,275 @@
+[
+  {
+    "name": "IMEI",
+    "conditions": [
+      {
+        "className": "android.telephony.TelephonyManager",
+        "methodPattern": "getDeviceId"
+      },
+      {
+        "methodPattern": "getimei"
+      }
+    ]
+  },
+  {
+    "name": "IMSI",
+    "conditions": [
+      {
+        "className": "android.telephony.TelephonyManager",
+        "methodPattern": "getSubscriberId"
+      },
+      {
+        "methodPattern": "getimsi"
+      }
+    ]
+  },
+  {
+    "name": "Sim SerialNumber(ICCID)",
+    "conditions": [
+      {
+        "className": "android.telephony.TelephonyManager",
+        "methodName": "getSimSerialNumber"
+      }
+    ]
+  },
+  {
+    "name": "Mac Address",
+    "conditions": [
+      {
+        "stringPattern": "/sys/class/net/\\S+/address"
+      },
+      {
+        "className": "java.net.NetworkInterface",
+        "methodName": "getHardwareAddress"
+      },
+      {
+        "className": "android.net.wifi.WifiInfo",
+        "methodName": "getMacAddress"
+      }
+    ]
+  },
+  {
+    "name": "AndroidID",
+    "conditions": [
+      {
+        "className": "android.provider.Settings$Secure",
+        "methodName": "getString",
+        "arguments": {
+          "1": "android_id"
+        }
+      }
+    ]
+  },
+  {"name":  "SerialNo",
+  "conditions": [
+    {
+      "stringPattern": "<android.os.Build: java.lang.String SERIAL>"
+    },
+    {
+      "stringPattern": "ro.\\S*serialno"
+    }
+  ]},
+  {
+    "name": "Phone Number",
+    "conditions": [
+      {
+        "className": "android.telephony.TelephonyManager",
+        "methodPattern": "getLine.?Number"
+      },
+      {
+        "methodPattern": "getphonenumber"
+      }
+    ]
+  },
+
+  {
+    "name": "WiFi Info",
+    "conditions": [
+      {
+        "className": "android.net.wifi.WifiInfo",
+        "methodPattern": "getMacAddress|getBSSID|getIpAddress|getSSID"
+      },
+      {
+        "className": "android.net.wifi.WifiManager",
+        "methodPattern": "getScanResults|getConnectionInfo"
+      }
+    ]
+  },
+  {
+    "name": "Location Info",
+    "conditions": [
+      {
+        "className": "android.location.Location",
+        "methodPattern": "getLatitude|getLongitude"
+      },
+      {
+        "className": "android.location.LocationManager",
+        "methodPattern": "getLastKnownLocation|requestLocationUpdates|getLastLocation|getCellLocation"
+      }
+    ]
+  },
+  {
+    "name": "Sensor Data",
+    "conditions": [
+      {
+        "className": "android.hardware.SensorManager",
+        "methodName": "registerListener"
+      }
+    ]
+  },
+  {
+    "name": "Package List",
+    "conditions": [
+      {
+        "className": "android.content.pm.PackageManager",
+        "methodPattern": "getInstallerPackageName|getInstalledApplications|getInstalledModules|getInstalledPackages"
+      },
+      {
+        "className": "android.app.ApplicationPackageManager",
+        "methodPattern": "getInstalledPackages"
+      }
+    ]
+  },
+
+  {
+    "name": "Device Admin",
+    "conditions": [
+      {
+        "stringPattern": "android.app.action.ADD_DEVICE_ADMIN"
+      }
+    ]
+  },
+  {
+    "name": "Media Record",
+    "conditions": [
+      {
+        "className": "android.media.MediaRecorder",
+        "methodName": "start"
+      },
+      {
+        "className": "android.media.AudioRecord",
+        "methodName": "start"
+      }
+    ]
+  },
+  {
+    "name": "Camera Access",
+    "conditions": [
+      {
+        "className": "android.hardware.Camera",
+        "methodPattern": "open"
+      }
+    ]
+  },
+
+  {
+    "name": "SMS Send",
+    "conditions": [
+      {
+        "className": "android.telephony.SmsManager",
+        "methodPattern": "send\\S*Message"
+      }
+    ]
+  },
+  {
+    "name": "SMS Access",
+    "conditions": [
+      {
+        "className": "android.content.ContentResolver",
+        "methodPattern": "query",
+        "arguments": {
+          "0": "content://sms/"
+        }
+      },
+      {
+        "className": "android.content.UriMatcher",
+        "methodName": "addURI",
+        "arguments": {
+          "0": "sms"
+        }
+      },
+      {
+        "stringPattern": "content://sms/"
+      }
+    ]
+  },
+  {
+    "name": "SMS Monitor",
+    "conditions": [
+      {
+        "className": "android.content.ContentResolver",
+        "methodName": "registerContentObserver",
+        "arguments": {
+          "0": "content://sms"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Contacts Access",
+    "conditions": [
+      {
+        "className": "android.content.ContentResolver",
+        "methodPattern": "query",
+        "arguments": {
+          "0": "content://com.android.contacts|<android.provider.ContactsContract\\S*: android.net.Uri CONTENT_URI>"
+        }
+      },
+      {
+        "className": "android.content.UriMatcher",
+        "methodName": "addURI",
+        "arguments": {
+          "0": "com.android.contacts"
+        }
+      },
+      {
+        "className": "android.provider.ContactsContract$Contacts"
+      },
+      {
+        "stringPattern": "content://com.android.contacts|<android.provider.ContactsContract\\S*: android.net.Uri CONTENT_URI>"
+      }
+    ]
+  },
+  {
+    "name": "CallLog Access",
+    "conditions": [
+      {
+        "className": "android.content.ContentResolver",
+        "methodPattern": "query",
+        "arguments": {
+          "0": "content://call_log|<android.provider.CallLog\\S*: android.net.Uri CONTENT_URI>"
+        }
+      },
+      {
+        "className": "android.content.UriMatcher",
+        "methodName": "addURI",
+        "arguments": {
+          "0": "call_log"
+        }
+      },
+      {
+        "stringPattern": "content://call_log|<android.provider.CallLog\\S*: android.net.Uri CONTENT_URI>"
+      }
+    ]
+  },
+  {
+    "name": "Call Status Monitor",
+    "conditions": [
+      {
+        "className": "android.telephony.TelephonyManager",
+        "methodName": "listen"
+      }
+    ]
+  },
+  {
+    "name": "Call Phone",
+    "conditions": [
+      {
+        "stringPattern": "android.intent.action.CALL"
+      },
+      {
+        "stringPattern": "<android.content.Intent: android.net.Uri ACTION_CALL>"
+      }
+    ]
+  }
+]

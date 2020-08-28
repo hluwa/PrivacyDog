@@ -7,9 +7,7 @@ import org.apache.commons.cli.ParseException;
 import soot.*;
 import soot.options.Options;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -65,7 +63,14 @@ public class PrivacyDog {
     private static void setupRule() {
         File ruleFile = new File(ruleFilePath);
         if (!ruleFile.exists()) {
-            logger.warning("Can't not found rule file.");
+            logger.warning("Can't not found rule file，use default rules.");
+            try {
+                InputStream assetStream = PrivacyDog.class.getClassLoader().getResourceAsStream("privacydog.json");
+                assert assetStream != null;
+                rules = new Gson().fromJson(new InputStreamReader(assetStream), Rule[].class);
+            }catch (Exception e){
+                logger.warning("Can't read rules from assets.");
+            }
             return;
         }
 
@@ -157,16 +162,6 @@ public class PrivacyDog {
             PackManager.v().getPack("jtp").add(new Transform("jtp.privacy_detection", transformer));
             PackManager.v().runPacks();
 
-//        List<Pair<StmtLocation, Rule>> result = transformer.getResult();
-//        for (Pair<StmtLocation, Rule> pair : result) {
-//            StmtLocation location = pair.getO1();
-//            Rule rule = pair.getO2();
-//            System.out.println(String.format("[%s] %s->%s :%s",
-//                    rule.getName(),
-//                    location.getBody().getMethod().getDeclaringClass().getName(),
-//                    location.getBody().getMethod().getName(),
-//                    location.getStmt()));
-//        }
             Map<Rule, List<StmtLocation>> resultMap = transformer.getResultMap();
             for (Rule rule : resultMap.keySet()) {
                 System.out.println("\t" + rule.getName());

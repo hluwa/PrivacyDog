@@ -56,6 +56,7 @@ public class PrivacyDog {
         Options.v().set_android_api_version(23);
         Scene.v().addBasicClass("java.io.PrintStream", SootClass.SIGNATURES);
         Scene.v().addBasicClass("java.lang.System", SootClass.SIGNATURES);
+		Scene.v().addBasicClass("android.content.pm.ProviderInfo", SootClass.SIGNATURES);
         Scene.v().loadNecessaryClasses();
     }
 

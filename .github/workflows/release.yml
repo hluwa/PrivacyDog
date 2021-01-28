@@ -26,6 +26,11 @@ jobs:
     - name: Assemble distributions
       run: ./gradlew assembleDist
       
+    - name: Get the version
+      id: getVersion
+      if: startsWith(github.ref, 'refs/tags/')
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      
     - name: Get Release Upload Url
       id: getReleaseUploadUrl
       uses: actions/github-script@v3.1.0
@@ -36,15 +41,12 @@ jobs:
             const releaseResponse = await github.repos.getReleaseByTag({
               owner: '${{ github.event.repository.owner.name }}',
               repo: '${{ github.event.repository.name }}',
-              tag: '${{ github.ref }}'
+              tag: '${{ steps.getVersion.outputs.VERSION }}'
             })
             const {
-              data: { id: releaseId, html_url: htmlUrl, upload_url: uploadUrl }
+              data: { upload_url: uploadUrl }
             } = releaseResponse;
-            core.setOutput('id', releaseId);
-            core.setOutput('html_url', htmlUrl);
             core.setOutput('upload_url', uploadUrl);
-            core.setOutput('version', releaseVersion);
           } catch (e) {
             core.setFailed(e.message);
           }

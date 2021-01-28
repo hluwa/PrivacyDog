@@ -17,8 +17,7 @@ import static soot.options.Options.output_format_jimple;
 
 public class PrivacyDog {
 
-    static String androidJar = "/usr/share/android-sdk/platforms";
-    static String targetPath = "/home/kali/Downloads/open_ad_sdk.aar";
+    static String targetPath = "";
     static String ruleFilePath = "privacydog.json";
 
     private static Rule[] rules;
@@ -27,12 +26,20 @@ public class PrivacyDog {
     private static void setupSoot(String taskPath) throws IOException {
         G.reset();
         Options.v().set_allow_phantom_refs(true);
-        Options.v().set_whole_program(true);
-        Options.v().set_prepend_classpath(true);
+        Options.v().set_allow_phantom_elms(true);
         Options.v().set_ignore_resolving_levels(true);
         Options.v().set_ignore_resolution_errors(true);
-        Options.v().set_validate(false);
-        if(taskPath.endsWith(".apk") || taskPath.endsWith(".dex")){
+        Options.v().set_no_bodies_for_excluded(true);
+        Options.v().set_whole_program(false);
+        Options.v().set_throw_analysis(Options.throw_analysis_dalvik);
+        Options.v().set_soot_classpath(Scene.defaultJavaClassPath());
+        Options.v().set_output_format(output_format_jimple);
+        Options.v().setPhaseOption("cg", "all-reachable:true");
+        Options.v().setPhaseOption("jb.dae", "enabled:false");
+        Options.v().setPhaseOption("jb.uce", "enabled:false");
+        Options.v().setPhaseOption("jj.dae", "enabled:false");
+        Options.v().setPhaseOption("jj.uce", "enabled:false");
+        if (taskPath.endsWith(".apk") || taskPath.endsWith(".dex")) {
             Options.v().set_src_prec(Options.src_prec_apk);
             Options.v().set_process_multiple_dex(true);
         }
@@ -51,13 +58,6 @@ public class PrivacyDog {
         } else {
             Options.v().set_process_dir(Collections.singletonList(taskPath));
         }
-        Options.v().set_android_jars(androidJar);
-        Options.v().set_include_all(true);
-        Options.v().set_force_overwrite(true);
-        Options.v().set_android_api_version(23);
-        Scene.v().addBasicClass("java.io.PrintStream", SootClass.SIGNATURES);
-        Scene.v().addBasicClass("java.lang.System", SootClass.SIGNATURES);
-		Scene.v().addBasicClass("android.content.pm.ProviderInfo", SootClass.SIGNATURES);
         Scene.v().loadNecessaryClasses();
     }
 
@@ -96,9 +96,8 @@ public class PrivacyDog {
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
 
 
-        options.addOption("t","target",true,"target file or dir.");
-        options.addOption("s","android-sdk",true,"require a platforms path of android sdk, default is: /usr/share/android-sdk/platforms");
-        options.addOption("r","rule",true,"rule file target, default is 'privacydog.json'.");
+        options.addOption("t", "target", true, "target file or dir.");
+        options.addOption("r", "rule", true, "rule file target, default is 'privacydog.json'.");
 
 
         try {
@@ -109,22 +108,12 @@ public class PrivacyDog {
             }
             targetPath = commandLine.getOptionValue("t");
 
-            if(commandLine.hasOption("s")){
-                androidJar = commandLine.getOptionValue("s");
-            }
-
             if (commandLine.hasOption("r")) {
                 ruleFilePath = commandLine.getOptionValue("r");
             }
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        if (!new File(androidJar).exists() || !new File(androidJar).isDirectory()){
-            System.err.println("Can't found Android SDK, Need input platforms path of android sdk with -s.");
-            return;
-        }
-
 
         setupRule();
         if (rules == null || rules.length == 0) {

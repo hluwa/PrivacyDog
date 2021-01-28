@@ -1,7 +1,4 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: Automation Upload Release
 
 on:
   release:
@@ -70,5 +67,5 @@ jobs:
       with:
         upload_url: '${{ steps.checkReleaseVersion.outputs.upload_url }}'
         asset_path: '${{ github.workspace }}/build/distributions/PrivacyDog.zip'
-        asset_name: 'PrivacyDog-${{ GITHUB_REF }}-RELEASE.zip'
+        asset_name: 'PrivacyDog-${{ github.ref }}-RELEASE.zip'
         asset_content_type: application/octet-stream

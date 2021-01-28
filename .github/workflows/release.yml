@@ -5,7 +5,7 @@ name: Java CI with Gradle
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   build:
@@ -39,7 +39,7 @@ jobs:
             const releaseResponse = await github.repos.getReleaseByTag({
               owner: '${{ github.event.repository.owner.name }}',
               repo: '${{ github.event.repository.name }}',
-              tag: '${{ GITHUB_REF }}'
+              tag: '${{ github.ref }}'
             })
             const {
               data: { id: releaseId, html_url: htmlUrl, upload_url: uploadUrl }
@@ -59,7 +59,7 @@ jobs:
       with:
         upload_url: '${{ steps.checkReleaseVersion.outputs.upload_url }}'
         asset_path: '${{ github.workspace }}/build/distributions/PrivacyDog.tar'
-        asset_name: 'PrivacyDog-${{ GITHUB_REF }}-RELEASE.tar'
+        asset_name: 'PrivacyDog-${{ github.ref }}-RELEASE.tar'
         asset_content_type: application/octet-stream
         
     

@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static soot.options.Options.output_format_jimple;
+
 public class PrivacyDog {
 
     static String androidJar = "/usr/share/android-sdk/platforms";
@@ -20,7 +22,7 @@ public class PrivacyDog {
     static String ruleFilePath = "privacydog.json";
 
     private static Rule[] rules;
-    private static Logger logger = Logger.getLogger("PrivacyDog");
+    private static final Logger logger = Logger.getLogger("PrivacyDog");
 
     private static void setupSoot(String taskPath) throws IOException {
         G.reset();
@@ -35,19 +37,18 @@ public class PrivacyDog {
             Options.v().set_process_multiple_dex(true);
         }
 
-        if(taskPath.endsWith(".aar")){
-            List<String> processList = new ArrayList();
+        if (taskPath.endsWith(".aar")) {
+            List<String> processList = new ArrayList<>();
             ZipFile zipFile = new ZipFile(taskPath);
             Path tempPath = Files.createTempDirectory(null);
             zipFile.extractAll(tempPath.toString());
-            for(File file : Objects.requireNonNull(new File(tempPath.toString()).listFiles())){
-                if(isCodeFile(file)){
+            for (File file : Objects.requireNonNull(new File(tempPath.toString()).listFiles())) {
+                if (isCodeFile(file)) {
                     processList.add(file.getPath());
                 }
             }
             Options.v().set_process_dir(processList);
-        }
-        else{
+        } else {
             Options.v().set_process_dir(Collections.singletonList(taskPath));
         }
         Options.v().set_android_jars(androidJar);
@@ -64,12 +65,12 @@ public class PrivacyDog {
     private static void setupRule() {
         File ruleFile = new File(ruleFilePath);
         if (!ruleFile.exists()) {
-            logger.warning("Can't not found rule file，use default rules.");
+            logger.warning("Unable to found rule file，use default rules.");
             try {
                 InputStream assetStream = PrivacyDog.class.getClassLoader().getResourceAsStream("privacydog.json");
                 assert assetStream != null;
                 rules = new Gson().fromJson(new InputStreamReader(assetStream), Rule[].class);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warning("Can't read rules from assets.");
             }
             return;
@@ -82,8 +83,7 @@ public class PrivacyDog {
         }
     }
 
-    public static boolean isCodeFile(File file)
-    {
+    public static boolean isCodeFile(File file) {
         return file.isFile() && (file.getName().endsWith(".jar")
                 || file.getName().endsWith(".apk")
                 || file.getName().endsWith(".dex")
@@ -102,9 +102,9 @@ public class PrivacyDog {
 
 
         try {
-            CommandLine commandLine = parser.parse(options,args);
-            if (!commandLine.hasOption("t")){
-                System.err.println("Need input target file or dir with -t.");
+            CommandLine commandLine = parser.parse(options, args);
+            if (!commandLine.hasOption("t")) {
+                System.err.println("Please input target path from '-t' option.");
                 return;
             }
             targetPath = commandLine.getOptionValue("t");
@@ -113,7 +113,7 @@ public class PrivacyDog {
                 androidJar = commandLine.getOptionValue("s");
             }
 
-            if(commandLine.hasOption("r")){
+            if (commandLine.hasOption("r")) {
                 ruleFilePath = commandLine.getOptionValue("r");
             }
         } catch (ParseException e) {
@@ -128,13 +128,13 @@ public class PrivacyDog {
 
         setupRule();
         if (rules == null || rules.length == 0) {
-            logger.warning("rule is empty");
+            logger.warning("The rule is empty");
             return;
         }
 
         File targetPath = new File(PrivacyDog.targetPath);
         if (!targetPath.exists()) {
-            logger.warning("apk not exists");
+            logger.warning("The target path is not exists");
             return;
         }
         List<File> files = new ArrayList<>();
@@ -145,16 +145,15 @@ public class PrivacyDog {
                     files.add(file);
                 }
             }
-        }
-        else if (isCodeFile(targetPath)){
+        } else if (isCodeFile(targetPath)) {
             files.add(targetPath);
         }
-        for(File file:files){
+        for (File file : files) {
             System.out.println("\n" + file.getName());
 
             try {
                 setupSoot(file.getPath());
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 continue;
             }
@@ -169,10 +168,10 @@ public class PrivacyDog {
                 List<StmtLocation> locations = resultMap.get(rule);
                 locations.sort(Comparator.comparing(stmtLocation -> stmtLocation.getBody().getMethod().getDeclaringClass().getName()));
                 for (StmtLocation location : locations) {
-                    System.out.println(String.format("\t\t%s->%s :%s",
+                    System.out.printf("\t\t%s->%s :%s%n",
                             location.getBody().getMethod().getDeclaringClass().getName(),
                             location.getBody().getMethod().getName(),
-                            location.getStmt()));
+                            location.getStmt());
                 }
             }
         }

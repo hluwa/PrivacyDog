@@ -100,24 +100,25 @@ class Condition {
     }
 
 
-    public boolean isInvokeCondition(){
+    public boolean isInvokeCondition() {
         return !conditionEmpty(className) || !conditionEmpty(classPattern)
                 || !conditionEmpty(methodName) || !conditionEmpty(methodPattern)
                 || !conditionEmpty(paramsCount) || !conditionEmpty(arguments);
     }
 
-    private boolean conditionEmpty(String key){
+    private boolean conditionEmpty(String key) {
         return key == null || key.isEmpty();
     }
 
-    private boolean conditionEmpty(int key){
+    private boolean conditionEmpty(int key) {
         return key == -1;
     }
 
 
-    private boolean conditionEmpty(Map key){
+    private boolean conditionEmpty(Map key) {
         return key == null || key.size() == 0;
     }
+
     @Override
     public String toString() {
         return "Condition{" +

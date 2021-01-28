@@ -18,7 +18,6 @@ import java.util.Map;
 public class ValueSetAnalysis extends ForwardFlowAnalysis<Unit, ValueSet> {
 
 
-    protected Map<Unit, FlowSet<ValueSet>> unitValueSetMap = new HashMap<>();
     ValueSet emptySet = new ValueSet();
 
 

@@ -1,0 +1,74 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Build with Gradle
+      run: ./gradlew build
+      
+    - name: Assemble distributions
+      run: ./gradlew assembleDist
+      
+    - name: Get Release Upload Url
+      id: getReleaseUploadUrl
+      uses: actions/github-script@v3.1.0
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          try {
+            const releaseResponse = await github.repos.getReleaseByTag({
+              owner: '${{ github.event.repository.owner.name }}',
+              repo: '${{ github.event.repository.name }}',
+              tag: '${{ GITHUB_REF }}'
+            })
+            const {
+              data: { id: releaseId, html_url: htmlUrl, upload_url: uploadUrl }
+            } = releaseResponse;
+            core.setOutput('id', releaseId);
+            core.setOutput('html_url', htmlUrl);
+            core.setOutput('upload_url', uploadUrl);
+            core.setOutput('version', releaseVersion);
+          } catch (e) {
+            core.setFailed(e.message);
+          }
+          
+    - name: Upload Tar Release
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: '${{ steps.checkReleaseVersion.outputs.upload_url }}'
+        asset_path: '${{ github.workspace }}/build/distributions/PrivacyDog.tar'
+        asset_name: 'PrivacyDog-${{ GITHUB_REF }}-RELEASE.tar'
+        asset_content_type: application/octet-stream
+        
+    
+    - name: Upload Zip Release
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: '${{ steps.checkReleaseVersion.outputs.upload_url }}'
+        asset_path: '${{ github.workspace }}/build/distributions/PrivacyDog.zip'
+        asset_name: 'PrivacyDog-${{ GITHUB_REF }}-RELEASE.zip'
+        asset_content_type: application/octet-stream

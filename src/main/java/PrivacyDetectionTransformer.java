@@ -17,9 +17,8 @@ import static soot.util.cfgcmd.CFGGraphType.EXCEPTIONAL_UNIT_GRAPH;
 
 public class PrivacyDetectionTransformer extends BodyTransformer {
     private Rule[] rules;
-    private List<Pair<StmtLocation, Rule>> result = new ArrayList<>();
-    private Map<Rule, List<StmtLocation>> resultMap = new HashMap<>();
-    private ValueSetAnalysis vsa;
+    private final List<Pair<StmtLocation, Rule>> result = new ArrayList<>();
+    private final Map<Rule, List<StmtLocation>> resultMap = new HashMap<>();
 
     public PrivacyDetectionTransformer(Rule[] rules) {
         this.rules = rules;
@@ -30,8 +29,7 @@ public class PrivacyDetectionTransformer extends BodyTransformer {
         if (rules == null || rules.length == 0) {
             return;
         }
-        vsa = null;
-//        if(!b.getMethod().getName().equals("checkWriteContacts")) return;
+        ValueSetAnalysis vsa = null;
 
         for (Unit unit : b.getUnits()) {
             if (unit == null) {
@@ -45,19 +43,23 @@ public class PrivacyDetectionTransformer extends BodyTransformer {
                         continue;
                     }
                     if (condition.isInvokeCondition()) {
-                        if (((Stmt) unit).containsInvokeExpr()) {
-                            InvokeExpr invokeExpr = ((Stmt) unit).getInvokeExpr();
-                            if (!verifyClass(invokeExpr, condition)
-                                    || !verifyMethod(invokeExpr, condition)
-                                    || !verifyArguments(invokeExpr, condition, b, (Stmt) unit)) {
-                                continue;
-                            }
-                        } else {
+                        if (!((Stmt) unit).containsInvokeExpr()) {
+                            continue;
+                        }
+                        InvokeExpr invokeExpr = ((Stmt) unit).getInvokeExpr();
+                        if (!verifyClass(invokeExpr, condition)
+                                || !verifyMethod(invokeExpr, condition)) {
+                            continue;
+                        }
+                        if (vsa == null) {
+                            vsa = new ValueSetAnalysis(EXCEPTIONAL_UNIT_GRAPH.buildGraph(b));
+                        }
+                        if (!verifyArguments(invokeExpr, condition, (Stmt) unit, vsa)) {
                             continue;
                         }
                     }
 
-                    result.add(new Pair<StmtLocation, Rule>(stmtLocation, rule));
+                    result.add(new Pair<>(stmtLocation, rule));
                     if (!resultMap.containsKey(rule)) {
                         resultMap.put(rule, new ArrayList<>());
                     }
@@ -102,11 +104,6 @@ public class PrivacyDetectionTransformer extends BodyTransformer {
             }
         }
 
-
-        if (invokeMethodName.equals("query")) {
-            invokeMethodName = "query";
-        }
-
         if (condition.getMethodPattern() != null) {
             Pattern pattern = Pattern.compile(condition.getMethodPattern(), CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(invokeMethodName);
@@ -116,7 +113,7 @@ public class PrivacyDetectionTransformer extends BodyTransformer {
         return true;
     }
 
-    private boolean verifyArguments(InvokeExpr invokeExpr, Condition condition, Body b, Stmt stmt) {
+    private boolean verifyArguments(InvokeExpr invokeExpr, Condition condition, Stmt stmt, ValueSetAnalysis vsa) {
         if (condition.getParamsCount() != -1 && condition.getParamsCount() != invokeExpr.getArgCount()) {
             return false;
         }
@@ -137,9 +134,7 @@ public class PrivacyDetectionTransformer extends BodyTransformer {
                     }
                 }
 
-                if (vsa == null) {
-                    vsa = new ValueSetAnalysis(EXCEPTIONAL_UNIT_GRAPH.buildGraph(b));
-                }
+
                 List<Pair<Object, Unit>> valuePairs = vsa.solveOf(stmt, value, true);
 
                 for (Pair<Object, Unit> pair : valuePairs) {

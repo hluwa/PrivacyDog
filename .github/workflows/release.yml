@@ -39,7 +39,7 @@ jobs:
         script: |
           try {
             const releaseResponse = await github.repos.getReleaseByTag({
-              owner: '${{ github.event.repository.owner.name }}',
+              owner: '${{ github.repository_owner }}',
               repo: '${{ github.event.repository.name }}',
               tag: '${{ steps.getVersion.outputs.VERSION }}'
             })

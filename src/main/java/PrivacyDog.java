@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -18,6 +19,7 @@ import static soot.options.Options.output_format_jimple;
 public class PrivacyDog {
 
     static String targetPath = "";
+    static String outputPath = null;
     static String ruleFilePath = "privacydog.json";
 
     private static Rule[] rules;
@@ -65,7 +67,7 @@ public class PrivacyDog {
     private static void setupRule() {
         File ruleFile = new File(ruleFilePath);
         if (!ruleFile.exists()) {
-            logger.warning("Unable to found rule file，use default rules.");
+            logger.warning("Unable to found rule file，Using inner default rules.");
             try {
                 InputStream assetStream = PrivacyDog.class.getClassLoader().getResourceAsStream("privacydog.json");
                 assert assetStream != null;
@@ -79,7 +81,7 @@ public class PrivacyDog {
         try {
             rules = new Gson().fromJson(new FileReader(ruleFile), Rule[].class);
         } catch (Exception e) {
-            logger.warning("parse rule fatal: " + e.toString());
+            logger.warning("Parse rule fatal: " + e.toString());
         }
     }
 
@@ -96,8 +98,9 @@ public class PrivacyDog {
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
 
 
-        options.addOption("t", "target", true, "target file or dir.");
-        options.addOption("r", "rule", true, "rule file target, default is 'privacydog.json'.");
+        options.addOption("t", "target", true, "target file or folder path;");
+        options.addOption("r", "rule", true, "rule file path, default is 'privacydog.json';");
+        options.addOption("o", "output", true, "output json to folder;");
 
 
         try {
@@ -110,6 +113,14 @@ public class PrivacyDog {
 
             if (commandLine.hasOption("r")) {
                 ruleFilePath = commandLine.getOptionValue("r");
+            }
+
+            if (commandLine.hasOption("o")) {
+                if(!(new File(outputPath).exists() && new File(outputPath).isDirectory())){
+                    System.err.println("Output need directory path;");
+                    return;
+                }
+                outputPath = commandLine.getOptionValue("o");
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -152,8 +163,11 @@ public class PrivacyDog {
             PackManager.v().runPacks();
 
             Map<Rule, List<StmtLocation>> resultMap = transformer.getResultMap();
+            Map<String, Map<String, List<String>>> jsonObject = new HashMap<>();
             for (Rule rule : resultMap.keySet()) {
                 System.out.println("\t" + rule.getName());
+                Map<String, List<String>> locationMap = new HashMap<>();
+                jsonObject.put(rule.getName(), locationMap);
                 List<StmtLocation> locations = resultMap.get(rule);
                 locations.sort(Comparator.comparing(stmtLocation -> stmtLocation.getBody().getMethod().getDeclaringClass().getName()));
                 for (StmtLocation location : locations) {
@@ -161,6 +175,23 @@ public class PrivacyDog {
                             location.getBody().getMethod().getDeclaringClass().getName(),
                             location.getBody().getMethod().getName(),
                             location.getStmt());
+                    String locationSig = String.format("%s->%s", location.getBody().getMethod().getDeclaringClass().getName(), location.getBody().getMethod().getName());
+                    if (!locationMap.containsKey(locationSig)) {
+                        locationMap.put(locationSig, new ArrayList<>());
+                    }
+                    locationMap.get(locationSig).add(location.getStmt().toString());
+
+                }
+            }
+            String jsonData = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create().toJson(jsonObject);
+            System.out.println(jsonData);
+            if (outputPath != null) {
+                try {
+                    FileWriter writer = new FileWriter(new File(outputPath, file.getName() + ".json"));
+                    writer.write(jsonData);
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

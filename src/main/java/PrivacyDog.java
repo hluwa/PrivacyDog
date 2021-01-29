@@ -117,7 +117,7 @@ public class PrivacyDog {
 
             if (commandLine.hasOption("o")) {
                 String o = commandLine.getOptionValue("o");
-                if(!(new File(o).exists() && new File(o).isDirectory())){
+                if (!(new File(o).exists() && new File(o).isDirectory())) {
                     System.err.println("Output need directory path;");
                     return;
                 }
@@ -170,7 +170,7 @@ public class PrivacyDog {
                 Map<String, List<String>> locationMap = new HashMap<>();
                 jsonObject.put(rule.getName(), locationMap);
                 List<StmtLocation> locations = resultMap.get(rule);
-                locations.sort(Comparator.comparing(stmtLocation -> stmtLocation.getBody().getMethod().getDeclaringClass().getName()));
+                locations.sort(Comparator.comparing(StmtLocation::getClassName));
                 for (StmtLocation location : locations) {
                     System.out.printf("\t\t%s->%s :%s%n",
                             location.getBody().getMethod().getDeclaringClass().getName(),

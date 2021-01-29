@@ -206,4 +206,12 @@ class StmtLocation {
     public void setBody(Body body) {
         this.body = body;
     }
+
+    public String getClassName() {
+        try {
+            return this.getBody().getMethod().getDeclaringClass().getName();
+        } catch (Exception e) {
+            return "";
+        }
+    }
 }

@@ -116,11 +116,12 @@ public class PrivacyDog {
             }
 
             if (commandLine.hasOption("o")) {
-                if(!(new File(outputPath).exists() && new File(outputPath).isDirectory())){
+                String o = commandLine.getOptionValue("o");
+                if(!(new File(o).exists() && new File(o).isDirectory())){
                     System.err.println("Output need directory path;");
                     return;
                 }
-                outputPath = commandLine.getOptionValue("o");
+                outputPath = o;
             }
         } catch (ParseException e) {
             e.printStackTrace();

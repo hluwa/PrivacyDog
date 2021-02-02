@@ -29,14 +29,12 @@ public class PrivacyDog {
         G.reset();
         Options.v().set_allow_phantom_refs(true);
         Options.v().set_allow_phantom_elms(true);
-        Options.v().set_oaat(true);
         Options.v().set_ignore_resolving_levels(true);
         Options.v().set_ignore_resolution_errors(true);
         Options.v().set_no_bodies_for_excluded(true);
         Options.v().set_whole_program(false);
         Options.v().set_throw_analysis(Options.throw_analysis_dalvik);
         Options.v().set_soot_classpath(Scene.defaultJavaClassPath());
-        Options.v().set_output_format(output_format_jimple);
         Options.v().setPhaseOption("cg", "all-reachable:true");
         Options.v().setPhaseOption("jb.dae", "enabled:false");
         Options.v().setPhaseOption("jb.uce", "enabled:false");

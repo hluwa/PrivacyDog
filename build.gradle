@@ -8,6 +8,10 @@ group 'cn.hluwa'
 sourceCompatibility = 1.8
 
 repositories {
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+
+    }
     mavenCentral()
 }
 
@@ -20,7 +24,7 @@ jar {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    compile group: 'org.soot-oss', name: 'soot', version: '4.3.0'
+    compile group: 'org.soot-oss', name: 'soot', version: '4.3.0-SNAPSHOT'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
     compile group: 'net.lingala.zip4j', name: 'zip4j', version: '2.6.1'
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'

@@ -35,6 +35,7 @@ public class PrivacyDog {
         Options.v().set_ignore_resolution_errors(true);
         Options.v().set_no_bodies_for_excluded(true);
         Options.v().set_whole_program(false);
+        Options.v().set_coffi(true);
         Options.v().set_throw_analysis(Options.throw_analysis_dalvik);
         Options.v().set_soot_classpath(Scene.defaultJavaClassPath());
         Options.v().setPhaseOption("cg", "all-reachable:true");
@@ -42,6 +43,8 @@ public class PrivacyDog {
         Options.v().setPhaseOption("jb.uce", "enabled:false");
         Options.v().setPhaseOption("jj.dae", "enabled:false");
         Options.v().setPhaseOption("jj.uce", "enabled:false");
+        Options.v().setPhaseOption("jtp.dae", "enabled:false");
+        Options.v().setPhaseOption("jtp.uce", "enabled:false");
         if (taskPath.endsWith(".apk") || taskPath.endsWith(".dex")) {
             Options.v().set_src_prec(Options.src_prec_apk);
             Options.v().set_process_multiple_dex(true);
@@ -94,7 +97,6 @@ public class PrivacyDog {
     }
 
     public static void main(String[] args) {
-
         CommandLineParser parser = new DefaultParser();
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
 

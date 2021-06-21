@@ -1,19 +1,13 @@
-import soot.JastAddJ.ExprStmt;
-import soot.Local;
-import soot.Scene;
 import soot.Unit;
 import soot.Value;
-import soot.jimple.AssignStmt;
 import soot.jimple.DefinitionStmt;
-import soot.jimple.internal.JAssignStmt;
-import soot.jimple.internal.JimpleLocal;
 import soot.toolkits.graph.DirectedGraph;
-import soot.toolkits.scalar.*;
+import soot.toolkits.scalar.ForwardFlowAnalysis;
+import soot.toolkits.scalar.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ValueSetAnalysis extends ForwardFlowAnalysis<Unit, ValueSet> {
 

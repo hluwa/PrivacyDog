@@ -5,7 +5,10 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
-import soot.*;
+import soot.G;
+import soot.PackManager;
+import soot.Scene;
+import soot.Transform;
 import soot.options.Options;
 
 import java.io.*;
@@ -13,8 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
-
-import static soot.options.Options.output_format_jimple;
 
 public class PrivacyDog {
 
@@ -27,6 +28,7 @@ public class PrivacyDog {
 
     private static void setupSoot(String taskPath) throws IOException {
         G.reset();
+        Options.v().set_wrong_staticness(Options.wrong_staticness_ignore);
         Options.v().set_allow_phantom_refs(true);
         Options.v().set_allow_phantom_elms(true);
         Options.v().set_ignore_resolving_levels(true);

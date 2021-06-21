@@ -60,15 +60,17 @@
       }
     ]
   },
-  {"name":  "SerialNo",
-  "conditions": [
-    {
-      "stringPattern": "<android.os.Build: java.lang.String SERIAL>"
-    },
-    {
-      "stringPattern": "ro.\\S*serialno"
-    }
-  ]},
+  {
+    "name": "SerialNo",
+    "conditions": [
+      {
+        "stringPattern": "<android.os.Build: java.lang.String SERIAL>"
+      },
+      {
+        "stringPattern": "ro.\\S*serialno"
+      }
+    ]
+  },
   {
     "name": "Phone Number",
     "conditions": [
@@ -81,7 +83,6 @@
       }
     ]
   },
-
   {
     "name": "WiFi Info",
     "conditions": [
@@ -130,7 +131,6 @@
       }
     ]
   },
-
   {
     "name": "Device Admin",
     "conditions": [
@@ -161,7 +161,6 @@
       }
     ]
   },
-
   {
     "name": "SMS Send",
     "conditions": [

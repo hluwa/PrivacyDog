@@ -1,7 +1,5 @@
 import soot.Unit;
 import soot.toolkits.scalar.AbstractFlowSet;
-import soot.toolkits.scalar.ArraySparseSet;
-import soot.toolkits.scalar.FlowSet;
 import soot.toolkits.scalar.Pair;
 
 import java.util.*;

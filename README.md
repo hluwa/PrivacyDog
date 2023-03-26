@@ -6,9 +6,9 @@
 
 ```
 PrivacyDog 
-    -t <APK/AAR/JAR/DEX> 输入文件
+    -t <APK/AAR/JAR/DEX> 输入文件/目录
     -r [可选] 规则文件地址, 默认使用内置规则
-    -o [可选] 输出文件, 默认仅输出 stdout
+    -o [可选] JSON 输出目录, 默认仅输出 stdout
 ```
 
 ## 扫描规则

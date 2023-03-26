@@ -29,7 +29,7 @@ public class PrivacyDetectionTransformer extends BodyTransformer {
         if (rules == null || rules.length == 0) {
             return;
         }
-        ValueSetAnalysis vsa = null;
+        DefinitionsAnalysis vsa = null;
 
         for (Unit unit : b.getUnits()) {
             if (unit == null) {
@@ -52,7 +52,7 @@ public class PrivacyDetectionTransformer extends BodyTransformer {
                             continue;
                         }
                         if (vsa == null) {
-                            vsa = new ValueSetAnalysis(EXCEPTIONAL_UNIT_GRAPH.buildGraph(b));
+                            vsa = new DefinitionsAnalysis(EXCEPTIONAL_UNIT_GRAPH.buildGraph(b));
                         }
                         if (!verifyArguments(invokeExpr, condition, (Stmt) unit, vsa)) {
                             continue;
@@ -113,7 +113,7 @@ public class PrivacyDetectionTransformer extends BodyTransformer {
         return true;
     }
 
-    private boolean verifyArguments(InvokeExpr invokeExpr, Condition condition, Stmt stmt, ValueSetAnalysis vsa) {
+    private boolean verifyArguments(InvokeExpr invokeExpr, Condition condition, Stmt stmt, DefinitionsAnalysis vsa) {
         if (condition.getParamsCount() != -1 && condition.getParamsCount() != invokeExpr.getArgCount()) {
             return false;
         }

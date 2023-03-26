@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ValueSetAnalysis extends ForwardFlowAnalysis<Unit, ValueSet> {
+public class DefinitionsAnalysis extends ForwardFlowAnalysis<Unit, ValueSet> {
 
 
     ValueSet emptySet = new ValueSet();
@@ -20,7 +20,7 @@ public class ValueSetAnalysis extends ForwardFlowAnalysis<Unit, ValueSet> {
      *
      * @param graph
      */
-    public ValueSetAnalysis(DirectedGraph graph) {
+    public DefinitionsAnalysis(DirectedGraph graph) {
         super(graph);
 
         doAnalysis();
